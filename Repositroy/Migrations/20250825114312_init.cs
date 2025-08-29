@@ -18,7 +18,7 @@ namespace ShanYue.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false),
-                    Title = table.Column<int>(type: "int", nullable: false),
+                    Title = table.Column<int>(type: "navarchar(20)", nullable: false),
                     Content = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },

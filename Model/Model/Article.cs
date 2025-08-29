@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Common.Attributes;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ShanYue.Model
@@ -6,11 +7,16 @@ namespace ShanYue.Model
     public class Article
     {
         [Key]
-        [Required]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public int Id { get; set; }
-        public int Title {  get; set; }
-        public string Content { get; set; }
-        public DateTime CreatedDate { get; set; } = DateTime.Now;
+        [SnowflakeId]
+        public long Id { get; set; }
+        [MaxLength(20)]
+        [Required]
+        public string Title {  get; set; } = string.Empty;
+        public string Content { get; set; } = string.Empty;
+        public DateTime? CreatedDate { get; set; } = DateTime.Now;
+        public DateTime? UpdatedDate { get; set; } = DateTime.Now;
+        public short Type { get; set; }
+        public string? Tags { get; set; } = string.Empty;
     }
 }

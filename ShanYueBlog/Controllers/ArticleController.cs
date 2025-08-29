@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ShanYue.Context;
+using ShanYue.Model;
 
 namespace ShanYue.Controllers
 {
@@ -8,7 +10,11 @@ namespace ShanYue.Controllers
     [Authorize("RBAC")]
     public class ArticleController : ControllerBase
     {
-        public ArticleController() { }
+        private readonly BlogContext blogContext;
+        public ArticleController(BlogContext blogContext) 
+        {
+            this.blogContext = blogContext;
+        }
 
         [HttpGet]
         public async Task<string> Get()
@@ -19,7 +25,10 @@ namespace ShanYue.Controllers
         [HttpPost]
         public async Task<string> Add()
         {
-            return "发布文章";
+            Article article = new Article { Title = "测试文章", Content="内容", Type = 1};
+            blogContext.Articles.Add(article);
+            int v = await blogContext.SaveChangesAsync();
+            return $"发布{v}文章";
         }
 
         [HttpDelete]

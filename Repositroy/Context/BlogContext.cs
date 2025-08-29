@@ -1,7 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Common.Attributes;
+using Microsoft.EntityFrameworkCore;
 using Model.Model;
 using ShanYue.Model;
 using ShanYue.Util;
+using System.Reflection;
 
 namespace ShanYue.Context
 {
@@ -141,16 +143,43 @@ namespace ShanYue.Context
             //optionsBuilder.UseInMemoryDatabase("ShanyueBlog");
         }
 
+        public override int SaveChanges()
+        {
+            foreach(var item in ChangeTracker.Entries())
+            {
+                if(item.State == EntityState.Added)
+                {
+                    PropertyInfo? propertyInfo = item.Entity.GetType()
+                        .GetProperties()
+                        .FirstOrDefault(x => x.GetCustomAttribute<SnowflakeIdAttribute>() != null);
+                    if(propertyInfo != null && (long)(propertyInfo.GetValue(item.Entity) ?? 0) != 0)
+                    {
+                        propertyInfo.SetValue(item.Entity, SnowflakeIdUtils.NextId());
+                    }
+                }
+            }
+            return base.SaveChanges();
+        }
+
+        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            foreach (var item in ChangeTracker.Entries())
+            {
+                if (item.State == EntityState.Added)
+                {
+                    PropertyInfo? propertyInfo = item.Entity.GetType()
+                        .GetProperties()
+                        .FirstOrDefault(x => x.GetCustomAttribute<SnowflakeIdAttribute>() != null);
+                    if (propertyInfo != null && (long)(propertyInfo.GetValue(item.Entity) ?? 0) == 0)
+                    {
+                        propertyInfo.SetValue(item.Entity, SnowflakeIdUtils.NextId());
+                    }
+                }
+            }
+            return base.SaveChangesAsync(cancellationToken);
+        }
+
         //这里是为了接受program.cs中注册时额外的配置
         public BlogContext(DbContextOptions<BlogContext> options) : base(options) { }
     }
-
-
-    //public class User
-    //{
-    //    public int Id { get; set; }
-    //    public string Name { get; set; } = string.Empty;
-    //    public string NickName { get; set; } = string.Empty;
-    //    public string Password { get; set; } = string.Empty;
-    //}
 }

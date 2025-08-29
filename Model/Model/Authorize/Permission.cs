@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Common.Attributes;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ShanYue.Model
@@ -7,6 +8,7 @@ namespace ShanYue.Model
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]       //不由数据库生成
+        [SnowflakeId]
         public long Id { get; set; }
         [Required]
         [MaxLength(20)]

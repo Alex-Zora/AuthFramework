@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ShanYue.Context;
 
@@ -11,9 +12,11 @@ using ShanYue.Context;
 namespace ShanYue.Migrations
 {
     [DbContext(typeof(BlogContext))]
-    partial class BlogContextModelSnapshot : ModelSnapshot
+    [Migration("20250829175701_update_article")]
+    partial class update_article
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -54,7 +57,7 @@ namespace ShanYue.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Basicparameters", (string)null);
+                    b.ToTable("Basicparameters");
                 });
 
             modelBuilder.Entity("ShanYue.Model.Article", b =>
@@ -86,7 +89,7 @@ namespace ShanYue.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Articles", (string)null);
+                    b.ToTable("Articles");
                 });
 
             modelBuilder.Entity("ShanYue.Model.Permission", b =>
@@ -123,7 +126,7 @@ namespace ShanYue.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Permission", (string)null);
+                    b.ToTable("Permission");
 
                     b.HasData(
                         new
@@ -205,7 +208,7 @@ namespace ShanYue.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Role", (string)null);
+                    b.ToTable("Role");
 
                     b.HasData(
                         new
@@ -251,7 +254,7 @@ namespace ShanYue.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("RolePermissionTable", (string)null);
+                    b.ToTable("RolePermissionTable");
 
                     b.HasData(
                         new
@@ -352,7 +355,7 @@ namespace ShanYue.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("User", (string)null);
+                    b.ToTable("User");
 
                     b.HasData(
                         new
@@ -396,7 +399,7 @@ namespace ShanYue.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserRoleTable", (string)null);
+                    b.ToTable("UserRoleTable");
 
                     b.HasData(
                         new
@@ -438,7 +441,7 @@ namespace ShanYue.Migrations
 
                     b.HasKey("DateId");
 
-                    b.ToTable("WeatherForecasts", (string)null);
+                    b.ToTable("WeatherForecasts");
                 });
 
             modelBuilder.Entity("ShanYue.Model.RolePermissionTable", b =>
