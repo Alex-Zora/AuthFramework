@@ -8,6 +8,7 @@ using ShanYue.Model.ConfigModel;
 using ShanYue.Util;
 using StackExchange.Redis;
 using System.Security.Claims;
+using Role = ShanYue.Model.Role;
 
 namespace ShanYue.Controllers
 {
@@ -36,8 +37,9 @@ namespace ShanYue.Controllers
             //查询该用户是否在redis中是否有有效的token 如果有 直接返回token 否则生成token
             if (user != null) 
             {
+                List<Role> roles = _blogContext.Role.Include(x => x.RolePermissions).ThenInclude(y => y.permission).ToList();
                 //查询redis是否缓存了所有的角色权限 如果没有则缓存
-                await PermissionCache.AllRolePermissionCache(_connectionMultiplexer, _blogContext);
+                await PermissionCache.AllRolePermissionCache(_connectionMultiplexer, roles);
 
                 IDatabase redisDatabase = _connectionMultiplexer.GetDatabase();
                 RedisValue tokenValue = await redisDatabase.StringGetAsync(user.Id + "-" + user.Name);

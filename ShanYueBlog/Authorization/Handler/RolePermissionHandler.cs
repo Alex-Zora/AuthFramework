@@ -45,7 +45,7 @@ namespace ShanYue.Authorization.Handler
                             return;
                         }
                     }
-
+                    context.Fail();
                 }
             }
         }

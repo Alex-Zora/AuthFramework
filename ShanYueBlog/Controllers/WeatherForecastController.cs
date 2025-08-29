@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Client;
 using ShanYue.Context;
 using ShanYue.Model;
-using ShanYue.Model.Authorize;
 
 namespace ShanYue.Controllers
 {

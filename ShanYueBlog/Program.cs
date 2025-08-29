@@ -1,4 +1,4 @@
-
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -119,6 +119,14 @@ builder.Services
                         Code = 401,
                         msg = "请提供有效的认证token"
                     });
+                }
+                return Task.CompletedTask;
+            },
+            OnForbidden = context =>
+            {
+                if(!context.Response.HasStarted)
+                {
+                    return context.Response.WriteAsJsonAsync(new { Code = 403, msg = "无权访问该资源" });
                 }
                 return Task.CompletedTask;
             }

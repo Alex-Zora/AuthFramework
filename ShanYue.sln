@@ -5,7 +5,7 @@ VisualStudioVersion = 17.8.34330.188
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlogApi", "ShanYueBlog\BlogApi.csproj", "{CB4AD3DA-7CC8-4ED4-85CE-85875744471E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Repositroy", "Repositroy\Repositroy.csproj", "{3E8C1FC5-9F10-4553-A95C-ED3298671DEF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Repository", "Repositroy\Repository.csproj", "{3E8C1FC5-9F10-4553-A95C-ED3298671DEF}"
 	ProjectSection(ProjectDependencies) = postProject
 		{D5BDC1A4-0A32-48DF-8E53-F305EDB152B5} = {D5BDC1A4-0A32-48DF-8E53-F305EDB152B5}
 	EndProjectSection

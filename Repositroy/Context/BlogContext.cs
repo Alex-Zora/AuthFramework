@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Model.Model;
 using ShanYue.Model;
-using ShanYue.Model.Authorize;
 using ShanYue.Util;
 
 namespace ShanYue.Context
@@ -17,6 +17,7 @@ namespace ShanYue.Context
         public DbSet<UserRoleTable> UserRoleTable { get; set; }
         public DbSet<WeatherForecast> WeatherForecasts { get; set; }
         public DbSet<Article> Articles { get; set; }
+        public DbSet<Basicparameter> Basicparameters { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -29,6 +30,8 @@ namespace ShanYue.Context
                 entity.HasOne<Role>(x => x.role).WithMany(y => y.RolePermissions).HasForeignKey(z => z.RoleId);
                 entity.HasOne<Permission>(x => x.permission).WithMany(y => y.RolePermissions).HasForeignKey(z => z.PermissionId);
             });
+
+            builder.Entity<Basicparameter>().Ignore(x => x.Parent).Ignore(x => x.Children);
 
             //种子数据
             #region

@@ -1,5 +1,4 @@
-﻿using ShanYue.Model.Authorize;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ShanYue.Model
@@ -21,6 +20,8 @@ namespace ShanYue.Model
         [MaxLength(255)]
         public string? Description { get; set; }
         public List<RolePermissionTable>? RolePermissions { get; set; } = new List<RolePermissionTable>();
+        [MaxLength(1)]
+        public int type { get; set; }
 
         public Permission() { }
 

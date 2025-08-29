@@ -1,5 +1,4 @@
-﻿using ShanYue.Model.Authorize;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ShanYue.Model
