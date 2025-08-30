@@ -1,12 +1,16 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Common.Attributes;
+using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ShanYue.Model
 {
+    [Index(nameof(Account),IsUnique = true)]
     public class User
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]       //不由数据库生成
+        [SnowflakeId]
         public long Id { get; set; }
         [MaxLength(20)]
         public string Name { get; set; } = string.Empty;
@@ -14,12 +18,17 @@ namespace ShanYue.Model
         public string NickName { get; set; } = string.Empty;
         [MaxLength(15)]
         public string Account { get; set; } = string.Empty;
+        [MaxLength(256)]
+        public string Password { get; set; } = string.Empty;
+        /// <summary>
+        /// 密码盐值
+        /// </summary>
+        [MaxLength(128)]
+        public string? PasswordSalt { get; set; } = string.Empty;
         [EmailAddress]
         public string? Email { get; set; }
-        public DateTime? CreateTime { get; set; }
-        public DateTime? UpdateTime { get; set; }
-        [MaxLength(200)]
-        public string Password { get; set; } = string.Empty;
+        public DateTime? CreateTime { get; set; } = DateTime.Now;
+        public DateTime? UpdateTime { get; set; } = DateTime.Now;
 
         public List<UserRoleTable> UserRoles { get; set; } = new List<UserRoleTable>();
 

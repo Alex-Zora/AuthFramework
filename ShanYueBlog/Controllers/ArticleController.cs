@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using BlogApi.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ShanYue.Context;
 using ShanYue.Model;
@@ -7,7 +8,7 @@ namespace ShanYue.Controllers
 {
     [ApiController]
     [Route("api/[controller]/[action]")]
-    [Authorize("RBAC")]
+    [Authorize(AuthPolicy.RBAC_NAME)]
     public class ArticleController : ControllerBase
     {
         private readonly BlogContext blogContext;

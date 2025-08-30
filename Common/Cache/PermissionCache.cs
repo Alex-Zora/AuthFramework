@@ -13,32 +13,26 @@ namespace ShanYue.Cache
         /// <param name="connection"></param>
         /// <param name="context"></param>
         /// <returns></returns>
-        public async static Task AllRolePermissionCache(IConnectionMultiplexer connection, List<Role> roles)
+        public async static Task AllRolePermissionCache(IDatabase db, List<Role> roles)
         {
-            var db = connection.GetDatabase();
-            //如果缓存不存在 则加载
-            if(!(await db.KeyExistsAsync("RolePermission")))
+            //List<Role> roles = await context.Role.Include(x => x.RolePermissions).ThenInclude(y => y.permission).ToListAsync();
+            if (roles.Count > 0)
             {
-                //List<Role> roles = await context.Role.Include(x => x.RolePermissions).ThenInclude(y => y.permission).ToListAsync();
-                if (roles.Count > 0)
+                Dictionary<string, List<PermissionItem>> allRolePerm = new();
+                foreach (var role in roles)
                 {
-                    Dictionary<string, List<PermissionItem>> allRolePerm = new();
-                    foreach (var role in roles)
+                    List<PermissionItem> permissionItems = new();
+                    foreach (var perm in role.RolePermissions)
                     {
-                        List<PermissionItem> permissionItems = new();
-                        foreach (var perm in role.RolePermissions)
-                        {
-                            permissionItems.Add(new PermissionItem { Name = perm.permission.Name, Url = perm.permission.Url });
-                        }
-                        allRolePerm.Add(role.Id.ToString(), permissionItems);
-
-                        string jsonValue = JsonSerializer.Serialize(permissionItems);
-
-                        await db.HashSetAsync("Role_Permission", role.Id.ToString() + "-" + role.Name, jsonValue);
+                        permissionItems.Add(new PermissionItem { Name = perm.permission.Name, Url = perm.permission.Url });
                     }
+                    allRolePerm.Add(role.Id.ToString(), permissionItems);
+
+                    string jsonValue = JsonSerializer.Serialize(permissionItems);
+
+                    await db.HashSetAsync("Role_Permission", role.Id.ToString() + "-" + role.Name, jsonValue);
                 }
-            }
-            
+            }            
         }
 
         /// <summary>

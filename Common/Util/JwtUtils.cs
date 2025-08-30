@@ -8,7 +8,7 @@ namespace ShanYue.Util
 {
     public class JwtUtils
     { /// <summary>
-      /// 使用token Descriptor(描述器)创建token  使用HmacSha256加密算法
+      /// 使用token Descriptor(描述器)创建token  使用HmacSha256加密算法   推荐使用该方法
       /// </summary>
       /// <param name="claims"></param>
       /// <param name="expire"></param>

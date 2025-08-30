@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using BlogApi.Authorization;
+using Common.Util;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ShanYue.Cache;
@@ -8,6 +10,7 @@ using ShanYue.Model.ConfigModel;
 using ShanYue.Util;
 using StackExchange.Redis;
 using System.Security.Claims;
+using System.Text;
 using Role = ShanYue.Model.Role;
 
 namespace ShanYue.Controllers
@@ -32,14 +35,28 @@ namespace ShanYue.Controllers
         [AllowAnonymous]
         public async Task<string> Login(string username, string password)
         {
-            var user = await _blogContext.User.Where(x => username.Equals(x.Account) && password.Equals(x.Password)).FirstOrDefaultAsync();
+            var user = await _blogContext.User.Where(x => username.Equals(x.Account)).FirstOrDefaultAsync();
+            if(user == null)
+            {
+                return "用户不存在";
+            }
+            //校验密码
+            bool passCorrect = HashPasswordUtils.ParsePassword(password, Convert.FromBase64String(user.PasswordSalt!), user.Password);
+            if(!passCorrect)
+            {
+                return "密码错误";
+            }
             string token = "";
             //查询该用户是否在redis中是否有有效的token 如果有 直接返回token 否则生成token
             if (user != null) 
             {
-                List<Role> roles = _blogContext.Role.Include(x => x.RolePermissions).ThenInclude(y => y.permission).ToList();
+                IDatabase database = _connectionMultiplexer.GetDatabase();
                 //查询redis是否缓存了所有的角色权限 如果没有则缓存
-                await PermissionCache.AllRolePermissionCache(_connectionMultiplexer, roles);
+                if (!(await database.KeyExistsAsync("RolePermission")))
+                {
+                    List<Role> roles = _blogContext.Role.Include(x => x.RolePermissions).ThenInclude(y => y.permission).ToList();
+                    await PermissionCache.AllRolePermissionCache(database, roles);
+                }
 
                 IDatabase redisDatabase = _connectionMultiplexer.GetDatabase();
                 RedisValue tokenValue = await redisDatabase.StringGetAsync(user.Id + "-" + user.Name);
@@ -66,11 +83,27 @@ namespace ShanYue.Controllers
             return token;
         }
 
-        [Authorize("RBAC")]
-        [HttpGet]
-        public Task<string> test()
+        //[Authorize(policy: AuthPolicy.RBAC_NAME)]
+        [AllowAnonymous]
+        [HttpPost]
+        public async Task<string> Regist(User user)
         {
-            return Task.FromResult("token认证成功");
+            if(user == null)
+            {
+                return "注册失败!";
+            }
+            if((await _blogContext.User.Where(x => x.Account == user.Account.Trim()).FirstOrDefaultAsync()) != null)
+            {
+                return "账号已存在!";
+            }
+            //得到盐值 使用Base64编码
+            byte[] salt = HashPasswordUtils.GenerateSalt();
+            user.PasswordSalt = Convert.ToBase64String(salt);
+            //加密密码
+            user.Password = HashPasswordUtils.Encryption(user.Password, salt);
+            _blogContext.User.Add(user);
+            int v = await _blogContext.SaveChangesAsync();
+            return user.Id.ToString();
         }
     }
 }

@@ -4,9 +4,12 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Serilog;
+using Serilog.Events;
 using ShanYue.Authorization.Handler;
 using ShanYue.Authorization.Requirement;
 using ShanYue.Context;
+using ShanYue.Model;
 using ShanYue.Model.ConfigModel;
 using StackExchange.Redis;
 using System.Text;
@@ -20,18 +23,40 @@ var configuration = builder.Configuration;
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-//不需要添加任何操作  .net默认继承控制台日志provider 如果想清除默认的loggingprovider 使用builder.logging.ClearProviders()
-builder.Services.AddLogging(builder =>
-{
-    //var loggingConfigure = configuration.GetSection("Logging");
 
-    //builder.AddConfiguration(loggingConfigure);
-    //builder.AddConsole();
-});
-builder.Services.Configure<IdentityOptions>(options =>
+//serilog日志配置
+builder.Logging.ClearProviders();
+builder.Host.UseSerilog((context, services, config) =>
 {
-    options.SignIn.RequireConfirmedEmail = true;
+    config.ReadFrom.Configuration(context.Configuration); // 读取 appsettings.json的Serilog配置
 });
+//builder.Services.AddSerilog((context, option) =>
+//{
+//    option.MinimumLevel.Information() // 全局 Information级别
+//        // 保持 Hosting.Lifetime 日志为 Information（不要提升到 Warning）
+//        .MinimumLevel.Override("Microsoft.Hosting.Lifetime", LogEventLevel.Information)
+//        .MinimumLevel.Override("Microsoft.AspNetCore.Mvc", LogEventLevel.Warning)
+//        .MinimumLevel.Override("Microsoft.AspNetCore.Routing", LogEventLevel.Warning)
+//        .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database.Command", LogEventLevel.Warning)
+//        .WriteTo.Console();
+//});
+
+
+
+//不需要添加任何操作  .net默认继承控制台日志provider 如果想清除默认的loggingprovider 使用builder.logging.ClearProviders()
+//builder.Services.AddLogging(builder =>
+//{
+//    //var loggingConfigure = configuration.GetSection("Logging");
+
+//    //builder.AddConfiguration(loggingConfigure);
+//    //builder.AddConsole();
+//});
+//builder.Services.Configure<IdentityOptions>(options =>
+//{
+//    options.SignIn.RequireConfirmedEmail = true;
+//});
+
+//swagger配置
 builder.Services.AddSwaggerGen(options =>
 {
     //swagger携带token验证
@@ -45,6 +70,8 @@ builder.Services.AddSwaggerGen(options =>
         Scheme = "Bearer"
     });
 });
+
+//efcore配置
 builder.Services.AddDbContext<BlogContext>(options =>
 {
     //options.UseInMemoryDatabase("ShanyueBlog");
@@ -147,6 +174,8 @@ builder.Services.AddAuthorization(option =>
 });
 
 var app = builder.Build(); 
+
+//app.UseSerilogRequestLogging();
 
 app.UseSwagger();
 
