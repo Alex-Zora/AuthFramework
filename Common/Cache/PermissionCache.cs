@@ -1,4 +1,4 @@
-﻿using ShanYue.Model.Cache;
+﻿using ShanYue.Model.ViewModel;
 using StackExchange.Redis;
 using System.Text.Json;
 using Role = ShanYue.Model.Role;
@@ -18,7 +18,7 @@ namespace ShanYue.Cache
             //List<Role> roles = await context.Role.Include(x => x.RolePermissions).ThenInclude(y => y.permission).ToListAsync();
             if (roles.Count > 0)
             {
-                Dictionary<string, List<PermissionItem>> allRolePerm = new();
+                //Dictionary<string, List<PermissionItem>> allRolePerm = new();
                 foreach (var role in roles)
                 {
                     List<PermissionItem> permissionItems = new();
@@ -26,7 +26,7 @@ namespace ShanYue.Cache
                     {
                         permissionItems.Add(new PermissionItem { Name = perm.permission.Name, Url = perm.permission.Url });
                     }
-                    allRolePerm.Add(role.Id.ToString(), permissionItems);
+                    //allRolePerm.Add(role.Id.ToString(), permissionItems);
 
                     string jsonValue = JsonSerializer.Serialize(permissionItems);
 
@@ -77,7 +77,7 @@ namespace ShanYue.Cache
         }
 
         /// <summary>
-        /// 移除所有的角色权限
+        /// 移除缓存中所有的角色权限
         /// </summary>
         /// <param name="db"></param>
         /// <returns></returns>

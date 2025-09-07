@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ShanYue.Context;
 
@@ -11,9 +12,11 @@ using ShanYue.Context;
 namespace ShanYue.Migrations
 {
     [DbContext(typeof(BlogContext))]
-    partial class BlogContextModelSnapshot : ModelSnapshot
+    [Migration("20250830175306_usertable_token_version_filed")]
+    partial class usertable_token_version_filed
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -88,107 +91,6 @@ namespace ShanYue.Migrations
                     b.ToTable("Articles");
                 });
 
-            modelBuilder.Entity("ShanYue.Model.Module", b =>
-                {
-                    b.Property<long>("Id")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("CreateBy")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<long?>("CreateId")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTime?>("CreateTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<bool>("Enabled")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Func")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("Icon")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("IconNew")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<bool>("IsButton")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("IsHide")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("IsKeepAlive")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<int>("OrderSort")
-                        .HasColumnType("int");
-
-                    b.Property<long>("ParentId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("PermissionId")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("UpdateBy")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<long?>("UpdateId")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTime?>("UpdateTime")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Modules");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 0L,
-                            Code = "",
-                            CreateBy = "",
-                            CreateTime = new DateTime(2025, 9, 3, 0, 56, 5, 208, DateTimeKind.Local).AddTicks(2418),
-                            Description = "",
-                            Enabled = false,
-                            Func = "",
-                            Icon = "",
-                            IconNew = "",
-                            IsButton = false,
-                            IsHide = false,
-                            IsKeepAlive = false,
-                            OrderSort = 0,
-                            ParentId = 0L,
-                            PermissionId = 0L,
-                            UpdateBy = "",
-                            UpdateTime = new DateTime(2025, 9, 3, 0, 56, 5, 208, DateTimeKind.Local).AddTicks(2419)
-                        });
-                });
-
             modelBuilder.Entity("ShanYue.Model.Permission", b =>
                 {
                     b.Property<long>("Id")
@@ -228,56 +130,56 @@ namespace ShanYue.Migrations
                     b.HasData(
                         new
                         {
-                            Id = 1916916492496901L,
+                            Id = 1915868823474181L,
                             Code = "",
-                            CreatedDate = new DateTime(2025, 9, 3, 0, 56, 5, 208, DateTimeKind.Local).AddTicks(2408),
+                            CreatedDate = new DateTime(2025, 8, 31, 1, 53, 6, 638, DateTimeKind.Local).AddTicks(4501),
                             Description = "",
                             Name = "文章添加",
-                            UpdateDate = new DateTime(2025, 9, 3, 0, 56, 5, 208, DateTimeKind.Local).AddTicks(2408),
+                            UpdateDate = new DateTime(2025, 8, 31, 1, 53, 6, 638, DateTimeKind.Local).AddTicks(4502),
                             Url = "/api/article/add",
                             type = 0
                         },
                         new
                         {
-                            Id = 1916916492496902L,
+                            Id = 1915868823474182L,
                             Code = "",
-                            CreatedDate = new DateTime(2025, 9, 3, 0, 56, 5, 208, DateTimeKind.Local).AddTicks(2413),
+                            CreatedDate = new DateTime(2025, 8, 31, 1, 53, 6, 638, DateTimeKind.Local).AddTicks(4506),
                             Description = "",
                             Name = "文章删除",
-                            UpdateDate = new DateTime(2025, 9, 3, 0, 56, 5, 208, DateTimeKind.Local).AddTicks(2413),
+                            UpdateDate = new DateTime(2025, 8, 31, 1, 53, 6, 638, DateTimeKind.Local).AddTicks(4506),
                             Url = "/api/article/delete",
                             type = 0
                         },
                         new
                         {
-                            Id = 1916916492496903L,
+                            Id = 1915868823474183L,
                             Code = "",
-                            CreatedDate = new DateTime(2025, 9, 3, 0, 56, 5, 208, DateTimeKind.Local).AddTicks(2414),
+                            CreatedDate = new DateTime(2025, 8, 31, 1, 53, 6, 638, DateTimeKind.Local).AddTicks(4508),
                             Description = "",
                             Name = "文章修改",
-                            UpdateDate = new DateTime(2025, 9, 3, 0, 56, 5, 208, DateTimeKind.Local).AddTicks(2414),
+                            UpdateDate = new DateTime(2025, 8, 31, 1, 53, 6, 638, DateTimeKind.Local).AddTicks(4508),
                             Url = "/api/article/update",
                             type = 0
                         },
                         new
                         {
-                            Id = 1916916492496904L,
+                            Id = 1915868823474184L,
                             Code = "",
-                            CreatedDate = new DateTime(2025, 9, 3, 0, 56, 5, 208, DateTimeKind.Local).AddTicks(2415),
+                            CreatedDate = new DateTime(2025, 8, 31, 1, 53, 6, 638, DateTimeKind.Local).AddTicks(4509),
                             Description = "",
                             Name = "文章详情",
-                            UpdateDate = new DateTime(2025, 9, 3, 0, 56, 5, 208, DateTimeKind.Local).AddTicks(2415),
+                            UpdateDate = new DateTime(2025, 8, 31, 1, 53, 6, 638, DateTimeKind.Local).AddTicks(4509),
                             Url = "/api/article/GetDetail",
                             type = 0
                         },
                         new
                         {
-                            Id = 1916916492496905L,
+                            Id = 1915868823474185L,
                             Code = "",
-                            CreatedDate = new DateTime(2025, 9, 3, 0, 56, 5, 208, DateTimeKind.Local).AddTicks(2416),
+                            CreatedDate = new DateTime(2025, 8, 31, 1, 53, 6, 638, DateTimeKind.Local).AddTicks(4510),
                             Description = "",
                             Name = "文章列表",
-                            UpdateDate = new DateTime(2025, 9, 3, 0, 56, 5, 208, DateTimeKind.Local).AddTicks(2416),
+                            UpdateDate = new DateTime(2025, 8, 31, 1, 53, 6, 638, DateTimeKind.Local).AddTicks(4511),
                             Url = "/api/article/Get",
                             type = 0
                         });
@@ -310,27 +212,27 @@ namespace ShanYue.Migrations
                     b.HasData(
                         new
                         {
-                            Id = 1916916492496898L,
-                            CreatedDate = new DateTime(2025, 9, 3, 0, 56, 5, 208, DateTimeKind.Local).AddTicks(2399),
+                            Id = 1915868823474178L,
+                            CreatedDate = new DateTime(2025, 8, 31, 1, 53, 6, 638, DateTimeKind.Local).AddTicks(4494),
                             Description = "",
                             Name = "管理员",
-                            UpdateDate = new DateTime(2025, 9, 3, 0, 56, 5, 208, DateTimeKind.Local).AddTicks(2399)
+                            UpdateDate = new DateTime(2025, 8, 31, 1, 53, 6, 638, DateTimeKind.Local).AddTicks(4495)
                         },
                         new
                         {
-                            Id = 1916916492496899L,
-                            CreatedDate = new DateTime(2025, 9, 3, 0, 56, 5, 208, DateTimeKind.Local).AddTicks(2405),
+                            Id = 1915868823474179L,
+                            CreatedDate = new DateTime(2025, 8, 31, 1, 53, 6, 638, DateTimeKind.Local).AddTicks(4499),
                             Description = "",
                             Name = "普通用户",
-                            UpdateDate = new DateTime(2025, 9, 3, 0, 56, 5, 208, DateTimeKind.Local).AddTicks(2405)
+                            UpdateDate = new DateTime(2025, 8, 31, 1, 53, 6, 638, DateTimeKind.Local).AddTicks(4499)
                         },
                         new
                         {
-                            Id = 1916916492496900L,
-                            CreatedDate = new DateTime(2025, 9, 3, 0, 56, 5, 208, DateTimeKind.Local).AddTicks(2406),
+                            Id = 1915868823474180L,
+                            CreatedDate = new DateTime(2025, 8, 31, 1, 53, 6, 638, DateTimeKind.Local).AddTicks(4500),
                             Description = "",
                             Name = "游客",
-                            UpdateDate = new DateTime(2025, 9, 3, 0, 56, 5, 208, DateTimeKind.Local).AddTicks(2407)
+                            UpdateDate = new DateTime(2025, 8, 31, 1, 53, 6, 638, DateTimeKind.Local).AddTicks(4500)
                         });
                 });
 
@@ -339,22 +241,13 @@ namespace ShanYue.Migrations
                     b.Property<long>("Id")
                         .HasColumnType("bigint");
 
-                    b.Property<long?>("ModuleId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long?>("PermissionId")
+                    b.Property<long>("PermissionId")
                         .HasColumnType("bigint");
 
                     b.Property<long>("RoleId")
                         .HasColumnType("bigint");
 
-                    b.Property<string>("testFiles")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("ModuleId");
 
                     b.HasIndex("PermissionId");
 
@@ -365,73 +258,63 @@ namespace ShanYue.Migrations
                     b.HasData(
                         new
                         {
-                            Id = 1916916492496909L,
-                            PermissionId = 1916916492496901L,
-                            RoleId = 1916916492496898L,
-                            testFiles = ""
+                            Id = 1915868823474189L,
+                            PermissionId = 1915868823474181L,
+                            RoleId = 1915868823474178L
                         },
                         new
                         {
-                            Id = 1916916492496910L,
-                            PermissionId = 1916916492496902L,
-                            RoleId = 1916916492496898L,
-                            testFiles = ""
+                            Id = 1915868823474190L,
+                            PermissionId = 1915868823474182L,
+                            RoleId = 1915868823474178L
                         },
                         new
                         {
-                            Id = 1916916492496911L,
-                            PermissionId = 1916916492496903L,
-                            RoleId = 1916916492496898L,
-                            testFiles = ""
+                            Id = 1915868823474191L,
+                            PermissionId = 1915868823474183L,
+                            RoleId = 1915868823474178L
                         },
                         new
                         {
-                            Id = 1916916492496912L,
-                            PermissionId = 1916916492496904L,
-                            RoleId = 1916916492496898L,
-                            testFiles = ""
+                            Id = 1915868823474192L,
+                            PermissionId = 1915868823474184L,
+                            RoleId = 1915868823474178L
                         },
                         new
                         {
-                            Id = 1916916492496913L,
-                            PermissionId = 1916916492496905L,
-                            RoleId = 1916916492496898L,
-                            testFiles = ""
+                            Id = 1915868823474193L,
+                            PermissionId = 1915868823474185L,
+                            RoleId = 1915868823474178L
                         },
                         new
                         {
-                            Id = 1916916492496914L,
-                            PermissionId = 1916916492496901L,
-                            RoleId = 1916916492496899L,
-                            testFiles = ""
+                            Id = 1915868823474194L,
+                            PermissionId = 1915868823474181L,
+                            RoleId = 1915868823474179L
                         },
                         new
                         {
-                            Id = 1916916492496915L,
-                            PermissionId = 1916916492496902L,
-                            RoleId = 1916916492496899L,
-                            testFiles = ""
+                            Id = 1915868823474195L,
+                            PermissionId = 1915868823474182L,
+                            RoleId = 1915868823474179L
                         },
                         new
                         {
-                            Id = 1916916492496916L,
-                            PermissionId = 1916916492496904L,
-                            RoleId = 1916916492496899L,
-                            testFiles = ""
+                            Id = 1915868823474196L,
+                            PermissionId = 1915868823474184L,
+                            RoleId = 1915868823474179L
                         },
                         new
                         {
-                            Id = 1916916492496917L,
-                            PermissionId = 1916916492496905L,
-                            RoleId = 1916916492496899L,
-                            testFiles = ""
+                            Id = 1915868823474197L,
+                            PermissionId = 1915868823474185L,
+                            RoleId = 1915868823474179L
                         },
                         new
                         {
-                            Id = 1916916492496918L,
-                            PermissionId = 1916916492496904L,
-                            RoleId = 1916916492496900L,
-                            testFiles = ""
+                            Id = 1915868823474198L,
+                            PermissionId = 1915868823474184L,
+                            RoleId = 1915868823474180L
                         });
                 });
 
@@ -486,29 +369,29 @@ namespace ShanYue.Migrations
                     b.HasData(
                         new
                         {
-                            Id = 1916916492496896L,
+                            Id = 1915868823474176L,
                             Account = "shanyue",
-                            CreateTime = new DateTime(2025, 9, 3, 0, 56, 5, 208, DateTimeKind.Local).AddTicks(2379),
+                            CreateTime = new DateTime(2025, 8, 31, 1, 53, 6, 638, DateTimeKind.Local).AddTicks(4474),
                             Email = "mountainmono@gmail.com",
                             Name = "dk",
                             NickName = "山月",
                             Password = "123456",
                             PasswordSalt = "",
                             TokenVersion = 0,
-                            UpdateTime = new DateTime(2025, 9, 3, 0, 56, 5, 208, DateTimeKind.Local).AddTicks(2390)
+                            UpdateTime = new DateTime(2025, 8, 31, 1, 53, 6, 638, DateTimeKind.Local).AddTicks(4486)
                         },
                         new
                         {
-                            Id = 1916916492496897L,
+                            Id = 1915868823474177L,
                             Account = "xuecun",
-                            CreateTime = new DateTime(2025, 9, 3, 0, 56, 5, 208, DateTimeKind.Local).AddTicks(2397),
+                            CreateTime = new DateTime(2025, 8, 31, 1, 53, 6, 638, DateTimeKind.Local).AddTicks(4492),
                             Email = "1906525910@gmail.com",
                             Name = "kd",
                             NickName = "雪村",
                             Password = "123456",
                             PasswordSalt = "",
                             TokenVersion = 0,
-                            UpdateTime = new DateTime(2025, 9, 3, 0, 56, 5, 208, DateTimeKind.Local).AddTicks(2397)
+                            UpdateTime = new DateTime(2025, 8, 31, 1, 53, 6, 638, DateTimeKind.Local).AddTicks(4493)
                         });
                 });
 
@@ -534,21 +417,21 @@ namespace ShanYue.Migrations
                     b.HasData(
                         new
                         {
-                            Id = 1916916492496906L,
-                            RoleId = 1916916492496898L,
-                            UserId = 1916916492496896L
+                            Id = 1915868823474186L,
+                            RoleId = 1915868823474178L,
+                            UserId = 1915868823474176L
                         },
                         new
                         {
-                            Id = 1916916492496907L,
-                            RoleId = 1916916492496899L,
-                            UserId = 1916916492496897L
+                            Id = 1915868823474187L,
+                            RoleId = 1915868823474179L,
+                            UserId = 1915868823474177L
                         },
                         new
                         {
-                            Id = 1916916492496908L,
-                            RoleId = 1916916492496899L,
-                            UserId = 1916916492496896L
+                            Id = 1915868823474188L,
+                            RoleId = 1915868823474179L,
+                            UserId = 1915868823474176L
                         });
                 });
 
@@ -576,21 +459,17 @@ namespace ShanYue.Migrations
 
             modelBuilder.Entity("ShanYue.Model.RolePermissionTable", b =>
                 {
-                    b.HasOne("ShanYue.Model.Module", "module")
-                        .WithMany("RolePermissions")
-                        .HasForeignKey("ModuleId");
-
                     b.HasOne("ShanYue.Model.Permission", "permission")
                         .WithMany("RolePermissions")
-                        .HasForeignKey("PermissionId");
+                        .HasForeignKey("PermissionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("ShanYue.Model.Role", "role")
                         .WithMany("RolePermissions")
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("module");
 
                     b.Navigation("permission");
 
@@ -614,11 +493,6 @@ namespace ShanYue.Migrations
                     b.Navigation("Role");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("ShanYue.Model.Module", b =>
-                {
-                    b.Navigation("RolePermissions");
                 });
 
             modelBuilder.Entity("ShanYue.Model.Permission", b =>

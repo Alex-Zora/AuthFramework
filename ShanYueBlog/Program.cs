@@ -1,11 +1,15 @@
+ï»¿using Azure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using Serilog.Events;
+using Services.Interface;
 using ShanYue.Authorization.Handler;
 using ShanYue.Authorization.Requirement;
 using ShanYue.Context;
@@ -13,6 +17,8 @@ using ShanYue.Model;
 using ShanYue.Model.ConfigModel;
 using StackExchange.Redis;
 using System.Text;
+using System.Text.Json;
+using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,16 +30,22 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 
-//serilogÈÕÖ¾ÅäÖÃ
+//æ³¨å†ŒServicesç±»åº“
+builder.Services.Scan(scan => scan.FromAssembliesOf(typeof(IRedisService))
+    .AddClasses(c => c.Where(x => x.Name.EndsWith("Service")))
+    .AsImplementedInterfaces()
+    .WithScopedLifetime());
+
+//serilogæ—¥å¿—é…ç½®
 builder.Logging.ClearProviders();
 builder.Host.UseSerilog((context, services, config) =>
 {
-    config.ReadFrom.Configuration(context.Configuration); // ¶ÁÈ¡ appsettings.jsonµÄSerilogÅäÖÃ
+    config.ReadFrom.Configuration(context.Configuration); // è¯»å– appsettings.jsonçš„Serilogé…ç½®
 });
 //builder.Services.AddSerilog((context, option) =>
 //{
-//    option.MinimumLevel.Information() // È«¾Ö Information¼¶±ğ
-//        // ±£³Ö Hosting.Lifetime ÈÕÖ¾Îª Information£¨²»ÒªÌáÉıµ½ Warning£©
+//    option.MinimumLevel.Information() // å…¨å±€ Informationçº§åˆ«
+//        // ä¿æŒ Hosting.Lifetime æ—¥å¿—ä¸º Informationï¼ˆä¸è¦æå‡åˆ° Warningï¼‰
 //        .MinimumLevel.Override("Microsoft.Hosting.Lifetime", LogEventLevel.Information)
 //        .MinimumLevel.Override("Microsoft.AspNetCore.Mvc", LogEventLevel.Warning)
 //        .MinimumLevel.Override("Microsoft.AspNetCore.Routing", LogEventLevel.Warning)
@@ -43,7 +55,7 @@ builder.Host.UseSerilog((context, services, config) =>
 
 
 
-//²»ĞèÒªÌí¼ÓÈÎºÎ²Ù×÷  .netÄ¬ÈÏ¼Ì³Ğ¿ØÖÆÌ¨ÈÕÖ¾provider Èç¹ûÏëÇå³ıÄ¬ÈÏµÄloggingprovider Ê¹ÓÃbuilder.logging.ClearProviders()
+//ä¸éœ€è¦æ·»åŠ ä»»ä½•æ“ä½œ  .neté»˜è®¤ç»§æ‰¿æ§åˆ¶å°æ—¥å¿—provider å¦‚æœæƒ³æ¸…é™¤é»˜è®¤çš„loggingprovider ä½¿ç”¨builder.logging.ClearProviders()
 //builder.Services.AddLogging(builder =>
 //{
 //    //var loggingConfigure = configuration.GetSection("Logging");
@@ -56,13 +68,13 @@ builder.Host.UseSerilog((context, services, config) =>
 //    options.SignIn.RequireConfirmedEmail = true;
 //});
 
-//swaggerÅäÖÃ
+//swaggeré…ç½®
 builder.Services.AddSwaggerGen(options =>
 {
-    //swaggerĞ¯´øtokenÑéÖ¤
+    //swaggeræºå¸¦tokenéªŒè¯
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
-        Description = "Ç°×ºÎªBearer",
+        Description = "å‰ç¼€ä¸ºBearer",
         Name = "test",
         In = ParameterLocation.Header,
         Type = SecuritySchemeType.ApiKey,
@@ -71,69 +83,56 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-//efcoreÅäÖÃ
+//efcoreé…ç½®
 builder.Services.AddDbContext<BlogContext>(options =>
 {
     //options.UseInMemoryDatabase("ShanyueBlog");
     options.UseSqlServer("Server=localhost;Database=shanyue;Trusted_Connection=True;TrustServerCertificate=True;")
     //.LogTo(Console.WriteLine, LogLevel.Information)
+    .EnableSensitiveDataLogging()
     .EnableServiceProviderCaching();
 });
 
-//Ìí¼ÓredisÁ¬½ÓÊµÀı
+//æ·»åŠ redisè¿æ¥å®ä¾‹
 builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect("localhost:6379"));
 
-//jwt¼øÈ¨
+//jwté‰´æƒ
 builder.Services
-    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme) //È«¾ÖÄ¬ÈÏÈÏÖ¤·½Ê½ÎªBearer
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme) //å…¨å±€é»˜è®¤è®¤è¯æ–¹å¼ä¸ºBearer
     .AddJwtBearer(options =>
     {
-        var jwtConfig = configuration.GetRequiredSection("JwtConfig").Get<JwtConfig>() ?? throw new InvalidOperationException("ÎÄ¼şÃ»ÓĞÅäÖÃJwtConfig½Úµã");
+        var jwtConfig = configuration.GetRequiredSection("JwtConfig").Get<JwtConfig>() ?? throw new InvalidOperationException("æ–‡ä»¶æ²¡æœ‰é…ç½®JwtConfigèŠ‚ç‚¹");
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateLifetime = true,
-            ValidIssuer = jwtConfig.Issuer,
-            ValidAudience = jwtConfig.Audience,
-            ClockSkew = TimeSpan.FromMinutes(1),  //Ä¬ÈÏÔÊĞí5·ÖÖÓÊ±¼ä²î
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfig.SecretKey))
+            ValidIssuer = jwtConfig.AccessToken.Issuer,
+            ValidAudience = jwtConfig.AccessToken.Audience,
+            ClockSkew = TimeSpan.FromMinutes(1),  //é»˜è®¤å…è®¸5åˆ†é’Ÿæ—¶é—´å·®
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfig.AccessToken.SecretKey))
         };
 
-        //Ìí¼ÓtokenÊÂ¼ş 
+        //æ·»åŠ tokenäº‹ä»¶ 
         options.Events = new JwtBearerEvents
         {
-            //tokenÎŞĞ§»òÕß¹ıÆÚ´¥·¢¸ÃÊÂ¼ş
-            OnAuthenticationFailed = context =>
-            {
-                // ×èÖ¹Ä¬ÈÏµÄ´¦Àí
-                context.NoResult();
+            //tokenæ— æ•ˆæˆ–è€…è¿‡æœŸè§¦å‘è¯¥äº‹ä»¶
+            //OnAuthenticationFailed = context =>
+            //{
+            //    // å‘Šè¯‰åç»­ Challenge è¦ç”¨å“ªä¸ªæ¶ˆæ¯
+            //    context.HttpContext.Items["JwtError"] =
+            //        context.Exception is SecurityTokenExpiredException
+            //        ? "token expired"
+            //        : "token invalid";
 
-                // ¼ì²éÏìÓ¦ÊÇ·ñÒÑ¾­¿ªÊ¼
-                if (true)
-                {
-                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                    //context.Response.ContentType = "application/json";
-                    if(context.Exception.Message.Contains("expire", StringComparison.OrdinalIgnoreCase))
-                    {
-                        string msg = "token expired";
-
-#if DEBUG
-                        msg = msg + "," + context.Exception.Message;
-
-#endif
-                        if(!context.Response.HasStarted)
-                        {
-                            return context.Response.WriteAsJsonAsync(new { Code = 401, msg = msg });
-                        }
-                    }
-                }
-                return Task.CompletedTask;
-            },
-            //´Ë´¦ÎªÈ¨ÏŞÑéÖ¤Ê§°Üºó´¥·¢µÄÊÂ¼ş
+            //    // å–æ¶ˆé»˜è®¤å¤„ç†ï¼Œä½†ä¸å†™ Response
+            //    context.NoResult();
+            //    return Task.CompletedTask;
+            //},
+            //æ­¤å¤„ä¸ºæƒé™éªŒè¯å¤±è´¥åè§¦å‘çš„äº‹ä»¶
             OnChallenge = context =>
             {
-                //´Ë´¦´úÂëÎªÖÕÖ¹.Net CoreÄ¬ÈÏµÄ·µ»ØÀàĞÍºÍÊı¾İ½á¹û£¬Õâ¸öºÜÖØÒª
+                //æ­¤å¤„ä»£ç ä¸ºç»ˆæ­¢.Net Coreé»˜è®¤çš„è¿”å›ç±»å‹å’Œæ•°æ®ç»“æœï¼Œè¿™ä¸ªå¾ˆé‡è¦
                 context.HandleResponse();
-                // Ã»ÓĞĞ¯´øtoken
+                // æ²¡æœ‰æºå¸¦token
                 if (!context.Response.HasStarted)
                 {
                     context.HandleResponse();
@@ -141,11 +140,11 @@ builder.Services
                     //context.Response.ContentType = "application/json";
                     context.Response.Headers.Append("Token-Error", context.ErrorDescription);
 
-                    return context.Response.WriteAsJsonAsync(new
+                    return context.Response.WriteAsJsonAsync(JsonSerializer.Serialize(new
                     {
                         Code = 401,
-                        msg = "ÇëÌá¹©ÓĞĞ§µÄÈÏÖ¤token"
-                    });
+                        msg = "è¯·æä¾›æœ‰æ•ˆçš„è®¤è¯token"
+                    }));
                 }
                 return Task.CompletedTask;
             },
@@ -153,24 +152,75 @@ builder.Services
             {
                 if(!context.Response.HasStarted)
                 {
-                    return context.Response.WriteAsJsonAsync(new { Code = 403, msg = "ÎŞÈ¨·ÃÎÊ¸Ã×ÊÔ´" });
+                    return context.Response.WriteAsJsonAsync(JsonSerializer.Serialize(new { Code = 403, msg = "æ— æƒè®¿é—®è¯¥èµ„æº" }));
                 }
                 return Task.CompletedTask;
             }
         };
     });
 
-//×¢²á×Ô¶¨ÒåÊÚÈ¨²ßÂÔ
+//æ³¨å†Œè‡ªå®šä¹‰æˆæƒç­–ç•¥
 builder.Services.AddScoped<IAuthorizationHandler, RolePermissionHandler>();
 
-//Ìí¼ÓÊÚÈ¨·şÎñ
+//æ·»åŠ æˆæƒæœåŠ¡
 builder.Services.AddAuthorization(option =>
 {
-    //Ìí¼Óµ½×Ô¶¨ÒåÊÚÈ¨²ßÂÔ
+    //æ·»åŠ åˆ°è‡ªå®šä¹‰æˆæƒç­–ç•¥
     option.AddPolicy("RBAC", policy =>
     {
         policy.Requirements.Add(new RolePermissionRequirement());
     });
+});
+
+//æ³¨å†Œæ¥å£é™æµä¸­é—´ä»¶
+builder.Services.AddRateLimiter(options =>
+{
+    //ç™»å½•æ¥å£ç­–ç•¥
+    options.AddPolicy("LoginLimit", context =>
+    {
+        string userIP = context.Connection.RemoteIpAddress?.ToString() ?? "Unknown IP";
+        return RateLimitPartition.GetTokenBucketLimiter(userIP, _ =>
+        {
+            return new TokenBucketRateLimiterOptions
+            {
+                TokenLimit = 5,     //å•ä¸ªç”¨æˆ·æ¯åˆ†é’Ÿ5æ¬¡  å–å†³äºæ ¹æ®ä»¤ç‰Œæ…é‡Œé¢çš„å‰©ä½™çš„ä»¤ç‰Œ
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,    //å…ˆè¿›æ¥çš„è¯·æ±‚å…ˆå¤„ç†
+                QueueLimit = 0,     //è®¾ç½®æ’é˜Ÿé˜Ÿåˆ—0 æ„å‘³è¶…è¿‡5ä¸ªè¯·æ±‚è¶…è¿‡ç›´æ¥æ‹’ç»
+                TokensPerPeriod = 5,    //æ¯åˆ†é’Ÿè¡¥å……5ä¸ªä»¤ç‰Œ
+                ReplenishmentPeriod = TimeSpan.FromMinutes(1), //è¡¥å……å‘¨æœŸ1åˆ†é’Ÿ
+                AutoReplenishment = true,    //è‡ªåŠ¨è¡¥å……
+            };
+        });
+    });
+
+    //ä»¤ç‰Œåˆ·æ–°æ¥å£ç­–ç•¥
+    options.AddPolicy("RefreshLimit", context =>
+        RateLimitPartition.GetTokenBucketLimiter(context.Connection.RemoteIpAddress, _ =>
+            new TokenBucketRateLimiterOptions
+            {
+                TokenLimit = 3,
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                QueueLimit = 0,
+                TokensPerPeriod = 3,
+                ReplenishmentPeriod = TimeSpan.FromMinutes(1),
+                AutoReplenishment = true,
+            }));
+
+    options.OnRejected = (context, cancellationToken) =>
+    {
+        if (!context.HttpContext.Response.HasStarted)
+        {
+            context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+
+            return new ValueTask(context.HttpContext.Response.WriteAsJsonAsync(new
+            {
+                Code = 429,
+                Message = "è¯·æ±‚é¢‘ç¹, è¯·ç¨åå†è¯•!"
+            }, cancellationToken));
+        }
+        context.HttpContext.Abort();
+        return ValueTask.CompletedTask;
+    };
 });
 
 var app = builder.Build(); 
@@ -185,15 +235,17 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+app.UseRateLimiter();
+
 app.Run();
 
 
-//Ê¹ÓÃidentityµÄ×¢²á¡¢µÇÂ¼µÈ·½·¨£¬ ±£»¤ÁËÕâĞ©·½·¨ Ò²¾ÍÊÇlogin registµÈ·½·¨ĞèÒªÑéÖ¤ÊÚÈ¨
+//ä½¿ç”¨identityçš„æ³¨å†Œã€ç™»å½•ç­‰æ–¹æ³•ï¼Œ ä¿æŠ¤äº†è¿™äº›æ–¹æ³• ä¹Ÿå°±æ˜¯login registç­‰æ–¹æ³•éœ€è¦éªŒè¯æˆæƒ
 //app.MapIdentityApi<IdentityUser>();
-//Èç¹ûÒª±£»¤Ä³¸öapi µ÷ÓÃRequireAuthorization·½·¨  ¾ÙÀıÈçÏÂ
+//å¦‚æœè¦ä¿æŠ¤æŸä¸ªapi è°ƒç”¨RequireAuthorizationæ–¹æ³•  ä¸¾ä¾‹å¦‚ä¸‹
 //app.MapGet("/articleDetails", (HttpContext context) =>
 //{
-//    return "ÕâÊÇÒ»ÆªÎÄÕÂ";
+//    return "è¿™æ˜¯ä¸€ç¯‡æ–‡ç« ";
 //}).WithName("getDetails");
 //.RequireAuthorization();
 
@@ -208,6 +260,6 @@ app.Run();
 //}).RequireAuthorization();
 
 
-//±£»¤swagger ui
+//ä¿æŠ¤swagger ui
 /*app.MapSwagger().RequireAuthorization();*/
 

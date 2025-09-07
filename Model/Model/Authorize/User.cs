@@ -29,6 +29,10 @@ namespace ShanYue.Model
         public string? Email { get; set; }
         public DateTime? CreateTime { get; set; } = DateTime.Now;
         public DateTime? UpdateTime { get; set; } = DateTime.Now;
+        /// <summary>
+        /// 修改密码、 强制下线、登出
+        /// </summary>
+        public int TokenVersion { get; set; } = 0;
 
         public List<UserRoleTable> UserRoles { get; set; } = new List<UserRoleTable>();
 
