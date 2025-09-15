@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Model.ViewModel;
 using ShanYue.Authorization.Requirement;
 using ShanYue.Cache;
 using ShanYue.Context;
 using ShanYue.Model;
-using ShanYue.Model.ViewModel;
 using StackExchange.Redis;
 using System.Net;
 using System.Security.Claims;

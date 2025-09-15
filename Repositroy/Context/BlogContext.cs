@@ -1,9 +1,8 @@
-﻿using Common.Attributes;
-using Microsoft.EntityFrameworkCore;
-using Model.Model;
-using Model.Model.Authorize;
+﻿using Microsoft.EntityFrameworkCore;
+using Model.Attributes;
+using Model.Table;
+using Model.Table.Authorize;
 using Repository.Context;
-using ShanYue.Model;
 using ShanYue.Util;
 using System.Reflection;
 
@@ -22,7 +21,7 @@ namespace ShanYue.Context
         public DbSet<WeatherForecast> WeatherForecasts { get; set; }
         public DbSet<Article> Articles { get; set; }
         public DbSet<Basicparameter> Basicparameters { get; set; }
-        public DbSet<Model.Module> Modules { get; set; }
+        public DbSet<Model.Table.Authorize.Module> Modules { get; set; }
         //public DbSet<Router> Routers { get; set; }
 
 
@@ -36,7 +35,7 @@ namespace ShanYue.Context
             {
                 entity.HasOne<Role>(x => x.role).WithMany(y => y.RolePermissions).HasForeignKey(z => z.RoleId);
                 entity.HasOne<Permission>(x => x.permission).WithMany(y => y.RolePermissions).HasForeignKey(z => z.PermissionId);
-                entity.HasOne<Model.Module>(x => x.module).WithMany(x => x.RolePermissions).HasForeignKey(x => x.ModuleId);
+                entity.HasOne<Model.Table.Authorize.Module>(x => x.module).WithMany(x => x.RolePermissions).HasForeignKey(x => x.ModuleId);
             });
 
             builder.Entity<Basicparameter>().Ignore(x => x.Parent).Ignore(x => x.Children);
@@ -69,6 +68,11 @@ namespace ShanYue.Context
             return base.SaveChanges();
         }
 
+        /// <summary>
+        /// 生成雪花id
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
             foreach (var item in ChangeTracker.Entries())

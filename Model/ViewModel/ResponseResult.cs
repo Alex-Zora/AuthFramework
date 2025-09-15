@@ -18,5 +18,33 @@ namespace Model.ViewModel
         }
 
         public ResponseResult() { }
+
+        public static ResponseResult<T> Success(T response, string message = "")
+        {
+            return new ResponseResult<T>
+            {
+                response = response,
+                message = message
+            };
+        }
+
+        public static ResponseResult<T> Failed(int code = 400, string message = "操作失败")
+        {
+            return new ResponseResult<T>
+            {
+                code = code,
+                message = message
+            };
+        }
+    }
+
+    /// <summary>
+    /// 泛型推断类
+    /// </summary>
+    public class ResponseResult
+    {
+        public static ResponseResult<T> Success<T>(T response, string message = "") => ResponseResult<T>.Success(response, message);
+
+        public static ResponseResult<T> Failed<T>(int code = 400, string message = "操作失败") => ResponseResult<T>.Failed(code, message);
     }
 }

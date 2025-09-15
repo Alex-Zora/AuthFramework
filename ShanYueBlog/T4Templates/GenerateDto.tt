@@ -1,0 +1,91 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Reflection"#>
+<#@ import namespace="System.IO"#>
+<#@ output extension=".txt" #>
+
+<#
+		    string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            //string baseDirectory1 = AppContext.BaseDirectory;
+            Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
+            Assembly? assembly = assemblies.FirstOrDefault(x => x.GetName().Name == "Model");
+            if(assembly == null)
+            {
+                throw new Exception("没有找到目标dll文件");
+            }
+            string modelDir = Path.GetFullPath(Path.Combine(baseDirectory, @"..\..\..\.."));
+            //dto路径
+            string targetDir = Path.Combine(modelDir, @"Model\Dto");
+            if(!Directory.Exists(targetDir))
+            {
+                Directory.CreateDirectory(targetDir);
+            }
+            //扫描model的dll包
+            Type[] types = assembly.GetTypes();
+            List<Type> entityTypeList = types.Where(x => x.IsClass)
+                .Where(x => x.Namespace != null && x.Namespace.StartsWith("Model.Table"))
+                .Where(x => x.IsDefined(typeof(GenerateDtoAttribute), false)).ToList();
+            foreach (var item in entityTypeList)
+            {
+                var dtoFileName = Path.Combine(targetDir, item.Name + "Dto.cs");
+                using (var writer = new StreamWriter(dtoFileName, false))
+                {
+                    writer.WriteLine("using System;");
+                    writer.WriteLine();
+                    writer.WriteLine("namespace Model.Dto");
+                    writer.WriteLine("{");
+                    writer.WriteLine($"    public class {item.Name}Dto");
+                    writer.WriteLine("    {");
+                    //获取公共实例成员 并去除导航属性
+                    var properties = item.GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                        .Where(x => !x.PropertyType.IsClass && x.PropertyType != typeof(string));
+                    foreach (var property in properties)
+                    {
+
+                        writer.WriteLine($"        public {ConvertCSharpTypeName(property.PropertyType)} {property.Name} {{ get; set;}}");
+                    }
+                    writer.WriteLine("    }");
+                    writer.WriteLine("}");
+                }
+            }
+            // 清空默认输出，不生成默认 .txt 文件
+            this.GenerationEnvironment.Clear();
+#>
+
+<#+
+private string ConvertCSharpTypeName(Type type)
+{
+    if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
+    {
+       // 处理可空类型，如 Int32?
+       return ConvertCSharpTypeName(type.GetGenericArguments()[0]) + "?";
+    }
+
+    // 基本类型名映射
+    var typeNameMap = new Dictionary<Type, string>
+    {
+        { typeof(int), "int" },
+        { typeof(long), "long" },
+        { typeof(short), "short" },
+        { typeof(string), "string" },
+        { typeof(bool), "bool" },
+        { typeof(byte), "byte" },
+        { typeof(decimal), "decimal" },
+        { typeof(double), "double" },
+        { typeof(float), "float" },
+        { typeof(DateTime), "DateTime" },
+        { typeof(Guid), "Guid" },
+    };
+
+    if (typeNameMap.ContainsKey(type))
+    {
+        return typeNameMap[type];
+    }
+
+    // 对于其他类型，返回其全名
+    return type.Name;
+}
+#>

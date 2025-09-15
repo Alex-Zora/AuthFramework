@@ -1,9 +1,9 @@
 ﻿using Common.Cache;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Model.ViewModel;
 using Services.Interface;
 using ShanYue.Context;
-using ShanYue.Model.ViewModel;
 using StackExchange.Redis;
 using System.Text.Json;
 
@@ -22,7 +22,7 @@ namespace Services.Impl
 
         public async Task<bool> CacheAllRolePermissionAsync()
         {
-            List<ShanYue.Model.Role> roles = blogContext.Role.Include(x => x.RolePermissions).ToList();
+            List<Model.Table.Authorize.Role> roles = blogContext.Role.Include(x => x.RolePermissions).ToList();
             if (roles.Count > 0)
             {
                 //Dictionary<string, List<PermissionItem>> allRolePerm = new();

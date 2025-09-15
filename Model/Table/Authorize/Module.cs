@@ -1,10 +1,8 @@
-﻿using Common.Attributes;
-using ShanYue.Model;
-using System;
+﻿using Model.Attributes;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace ShanYue.Model
+namespace Model.Table.Authorize
 {
     public class Module
     {

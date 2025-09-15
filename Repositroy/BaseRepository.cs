@@ -18,6 +18,9 @@ namespace Repository
         private readonly BlogContext blogContext;
         private readonly DbSet<T> dbSet;
         private string primaryKeyName = string.Empty;
+        /// <summary>
+        /// 主键类型  暂时没用到 备用
+        /// </summary>
         private Type? primaryKeyType = null;
 
         private void GetPrimaryKeyInfo()
@@ -38,10 +41,10 @@ namespace Repository
             primaryKeyType = property.ClrType;
         }
 
-        public BaseRepository(BlogContext blogContext, DbSet<T> dbSet)
+        public BaseRepository(BlogContext blogContext)
         {
             this.blogContext = blogContext;
-            this.dbSet = dbSet;
+            this.dbSet = blogContext.Set<T>();
             //获取主键信息
             GetPrimaryKeyInfo();
         }
@@ -95,7 +98,7 @@ namespace Repository
 
         public async Task<T?> QueryById(long id)
         {
-            return await dbSet.FindAsync(id);
+            return await dbSet.FirstOrDefaultAsync(x => EF.Property<long>(x, primaryKeyName) == id);
         }
         public async Task<T?> QueryByIdAsNoTracking(long id)
         {
@@ -138,8 +141,9 @@ namespace Repository
             return pageViewModel;
         }
 
-        
-
-        
+        public Task<IQueryable<T>> Query()
+        {
+            return Task.FromResult(dbSet.Where(x => true));
+        }
     }
 }

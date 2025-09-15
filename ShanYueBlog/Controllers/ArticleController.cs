@@ -1,8 +1,8 @@
 ﻿using BlogApi.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Model.Table;
 using ShanYue.Context;
-using ShanYue.Model;
 
 namespace ShanYue.Controllers
 {

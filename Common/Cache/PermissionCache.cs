@@ -1,7 +1,7 @@
-﻿using ShanYue.Model.ViewModel;
+﻿using Model.ViewModel;
 using StackExchange.Redis;
 using System.Text.Json;
-using Role = ShanYue.Model.Role;
+using Role = Model.Table.Authorize.Role;
 
 namespace ShanYue.Cache
 {

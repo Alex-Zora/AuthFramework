@@ -54,6 +54,11 @@ namespace Services
             return await _dal.Query(whereExp, orderExp);
         }
 
+        public Task<IQueryable<T>> Query()
+        {
+            return _dal.Query();
+        }
+
         public async Task<List<T>> QueryAsNoTracking(Expression<Func<T, bool>>? whereExp = null, Expression<Func<T, PropertyInfo>>? orderExp = null)
         {
             return await _dal.QueryAsNoTracking(whereExp, orderExp);

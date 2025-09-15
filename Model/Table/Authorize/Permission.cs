@@ -1,9 +1,10 @@
-﻿using Common.Attributes;
+﻿using Model.Attributes;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace ShanYue.Model
+namespace Model.Table.Authorize
 {
+    [GenerateDto]
     public class Permission
     {
         [Key]

@@ -1,8 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Client;
+using Model.Table;
+using Model.Table.Authorize;
 using ShanYue.Context;
-using ShanYue.Model;
 
 namespace ShanYue.Controllers
 {

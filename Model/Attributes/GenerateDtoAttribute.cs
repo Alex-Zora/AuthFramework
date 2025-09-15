@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace Model.Attributes
 {
-    [AttributeUsage(AttributeTargets.Property)]
-    public class SnowflakeIdAttribute : Attribute
+    [AttributeUsage(validOn: AttributeTargets.Class)]
+    public class GenerateDtoAttribute : Attribute
     {
     }
 }

@@ -1,5 +1,4 @@
-﻿using Common.Attributes;
-using ShanYue.Model;
+﻿using Model.Attributes;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -8,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Model.Model.Authorize
+namespace Model.Table.Authorize
 {
     /// <summary>
     /// 前端路由信息

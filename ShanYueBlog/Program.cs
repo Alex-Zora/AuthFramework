@@ -1,5 +1,4 @@
-﻿using Azure;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -7,13 +6,13 @@ using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Repository;
 using Serilog;
-using Serilog.Events;
+using Services;
 using Services.Interface;
 using ShanYue.Authorization.Handler;
 using ShanYue.Authorization.Requirement;
 using ShanYue.Context;
-using ShanYue.Model;
 using ShanYue.Model.ConfigModel;
 using StackExchange.Redis;
 using System.Text;
@@ -35,6 +34,15 @@ builder.Services.Scan(scan => scan.FromAssembliesOf(typeof(IRedisService))
     .AddClasses(c => c.Where(x => x.Name.EndsWith("Service")))
     .AsImplementedInterfaces()
     .WithScopedLifetime());
+
+//注册Repository类库
+builder.Services.Scan(scan => scan.FromAssembliesOf(typeof(IBaseRepositroy<>))
+    .AddClasses(c => c.Where(x => x.Name.EndsWith("Repository")))
+    .AsImplementedInterfaces()
+    .WithScopedLifetime());
+
+builder.Services.AddScoped(typeof(IBaseRepositroy<>), typeof(BaseRepository<>));
+builder.Services.AddScoped(typeof(IBaseService<>), typeof(BaseService<>));
 
 //serilog日志配置
 builder.Logging.ClearProviders();
@@ -86,6 +94,7 @@ builder.Services.AddSwaggerGen(options =>
 //efcore配置
 builder.Services.AddDbContext<BlogContext>(options =>
 {
+    new IdentityOptions();
     //options.UseInMemoryDatabase("ShanyueBlog");
     options.UseSqlServer("Server=localhost;Database=shanyue;Trusted_Connection=True;TrustServerCertificate=True;")
     //.LogTo(Console.WriteLine, LogLevel.Information)

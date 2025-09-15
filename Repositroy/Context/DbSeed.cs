@@ -1,11 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using ShanYue.Model;
+using Model.Table.Authorize;
 using ShanYue.Util;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Repository.Context
 {

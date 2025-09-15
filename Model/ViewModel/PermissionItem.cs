@@ -1,4 +1,4 @@
-﻿namespace ShanYue.Model.ViewModel
+﻿namespace Model.ViewModel
 {
     public class PermissionItem
     {

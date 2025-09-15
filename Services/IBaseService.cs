@@ -83,5 +83,10 @@ namespace Services
         /// <param name="orderExp"></param>
         /// <returns></returns>
         Task<List<T>> QueryAsNoTracking(Expression<Func<T, bool>>? whereExp = null, Expression<Func<T, PropertyInfo>>? orderExp = null);
+        /// <summary>
+        /// 返回IQueryable
+        /// </summary>
+        /// <returns></returns>
+        Task<IQueryable<T>> Query();
     }
 }

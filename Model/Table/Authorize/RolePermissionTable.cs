@@ -1,9 +1,8 @@
-﻿using Common.Attributes;
-using Model.Model.Authorize;
+﻿using Model.Attributes;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace ShanYue.Model
+namespace Model.Table.Authorize
 {
     public class RolePermissionTable
     {

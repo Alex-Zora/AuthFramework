@@ -7,11 +7,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Model.Table.Authorize;
 using Model.ViewModel;
 using Services.Interface;
 using ShanYue.Cache;
 using ShanYue.Context;
-using ShanYue.Model;
 using ShanYue.Model.ConfigModel;
 using ShanYue.Util;
 using StackExchange.Redis;
@@ -20,7 +20,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
-using Role = ShanYue.Model.Role;
+using Role = Model.Table.Authorize.Role;
 
 namespace ShanYue.Controllers
 {

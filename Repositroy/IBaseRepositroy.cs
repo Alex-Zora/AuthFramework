@@ -83,5 +83,10 @@ namespace Repository
         /// <param name="orderExp"></param>
         /// <returns></returns>
         Task<List<T>> QueryAsNoTracking(Expression<Func<T, bool>>? whereExp = null, Expression<Func<T, PropertyInfo>>? orderExp = null);
+        /// <summary>
+        /// 返回一个IQueryable查询
+        /// </summary>
+        /// <returns></returns>
+        Task<IQueryable<T>> Query();
     }
 }

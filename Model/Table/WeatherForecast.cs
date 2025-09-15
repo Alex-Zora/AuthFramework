@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 
-namespace ShanYue.Model
+namespace Model.Table
 {
     public class WeatherForecast
     {
