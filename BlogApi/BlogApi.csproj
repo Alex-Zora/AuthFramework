@@ -8,22 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="T4Templates\GenerateDto.txt">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>GenerateDto.tt</DependentUpon>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="T4Templates\GenerateDto.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>GenerateDto.tt</DependentUpon>
-    </None>
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.4" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.4">
       <PrivateAssets>all</PrivateAssets>
@@ -47,6 +31,11 @@
     <None Update="T4Templates\GenerateDto.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>GenerateDto.txt</LastGenOutput>
+    </None>
+    <None Update="T4Templates\GenerateDto.txt">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>GenerateDto.tt</DependentUpon>
     </None>
   </ItemGroup>
 

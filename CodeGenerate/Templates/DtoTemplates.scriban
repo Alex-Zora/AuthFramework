@@ -1,0 +1,11 @@
+﻿using System;
+
+namespace Model.Dto
+{
+    public class {{ class_name }}
+    {
+{{ for item in properties }}
+        public {{ item.type }} {{ item.name }} { get; set; }
+{{ end }}
+    }
+}

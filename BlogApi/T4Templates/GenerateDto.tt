@@ -5,6 +5,8 @@
 <#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="System.Reflection"#>
 <#@ import namespace="System.IO"#>
+<#@ assembly name="$(SolutionDir)Model\bin\Debug\net8.0\Model.dll" #>
+<#@ import namespace="Model.Attributes" #>
 <#@ output extension=".txt" #>
 
 <#
@@ -33,6 +35,7 @@
                 var dtoFileName = Path.Combine(targetDir, item.Name + "Dto.cs");
                 using (var writer = new StreamWriter(dtoFileName, false))
                 {
+                    writer.WriteLine("#nullable enable");
                     writer.WriteLine("using System;");
                     writer.WriteLine();
                     writer.WriteLine("namespace Model.Dto");
@@ -52,7 +55,7 @@
                 }
             }
             // 清空默认输出，不生成默认 .txt 文件
-            this.GenerationEnvironment.Clear();
+            //this.GenerationEnvironment.Clear();
 #>
 
 <#+
