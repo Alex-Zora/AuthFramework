@@ -1,4 +1,4 @@
-﻿namespace ShanYue.Model.ConfigModel
+﻿namespace Extensions.Authentication
 {
     /// <summary>
     /// Jwt

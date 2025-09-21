@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using BlogApi.Config;
+using Extensions.Authentication;
+using Extensions.ServiceExtension;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -6,15 +9,10 @@ using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using Repository;
 using Serilog;
-using Services;
-using Services.Interface;
 using ShanYue.Authorization.Handler;
 using ShanYue.Authorization.Requirement;
 using ShanYue.Context;
-using ShanYue.Model.ConfigModel;
-using StackExchange.Redis;
 using System.Text;
 using System.Text.Json;
 using System.Threading.RateLimiting;
@@ -29,23 +27,17 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 
+//automapper注册
+builder.Services.AddAutoMapperSetup();
+
 //注册Services类库
-builder.Services.Scan(scan => scan.FromAssembliesOf(typeof(IRedisService))
-    .AddClasses(c => c.Where(x => x.Name.EndsWith("Service")))
-    .AsImplementedInterfaces()
-    .WithScopedLifetime());
-
+builder.Services.AddServiceSetup();
 //注册Repository类库
-builder.Services.Scan(scan => scan.FromAssembliesOf(typeof(IBaseRepositroy<>))
-    .AddClasses(c => c.Where(x => x.Name.EndsWith("Repository")))
-    .AsImplementedInterfaces()
-    .WithScopedLifetime());
-
-builder.Services.AddScoped(typeof(IBaseRepositroy<>), typeof(BaseRepository<>));
-builder.Services.AddScoped(typeof(IBaseService<>), typeof(BaseService<>));
+builder.Services.AddRepositorySetup();
 
 //serilog日志配置
 builder.Logging.ClearProviders();
+#region
 builder.Host.UseSerilog((context, services, config) =>
 {
     config.ReadFrom.Configuration(context.Configuration); // 读取 appsettings.json的Serilog配置
@@ -75,101 +67,23 @@ builder.Host.UseSerilog((context, services, config) =>
 //{
 //    options.SignIn.RequireConfirmedEmail = true;
 //});
+#endregion
 
 //swagger配置
-builder.Services.AddSwaggerGen(options =>
-{
-    //swagger携带token验证
-    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-    {
-        Description = "前缀为Bearer",
-        Name = "test",
-        In = ParameterLocation.Header,
-        Type = SecuritySchemeType.ApiKey,
-        BearerFormat = "JWT",
-        Scheme = "Bearer"
-    });
-});
+builder.Services.AddSwaggerSetup();
 
-//efcore配置
-builder.Services.AddDbContext<BlogContext>(options =>
-{
-    new IdentityOptions();
-    //options.UseInMemoryDatabase("ShanyueBlog");
-    options.UseSqlServer("Server=localhost;Database=shanyue;Trusted_Connection=True;TrustServerCertificate=True;")
-    //.LogTo(Console.WriteLine, LogLevel.Information)
-    .EnableSensitiveDataLogging()
-    .EnableServiceProviderCaching();
-});
+//efcore注入
+builder.Services.AddDbContextSetup(configuration.GetConnectionString("default") ?? throw new ArgumentNullException("数据库连接字符串不可为空"));
 
 //添加redis连接实例
-builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect("localhost:6379"));
+builder.Services.AddRedisSetup(configuration.GetValue<string>("Redis") ?? throw new ArgumentNullException("redis连接字符串不可为空"));
 
 //jwt鉴权
-builder.Services
-    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme) //全局默认认证方式为Bearer
-    .AddJwtBearer(options =>
-    {
-        var jwtConfig = configuration.GetRequiredSection("JwtConfig").Get<JwtConfig>() ?? throw new InvalidOperationException("文件没有配置JwtConfig节点");
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateLifetime = true,
-            ValidIssuer = jwtConfig.AccessToken.Issuer,
-            ValidAudience = jwtConfig.AccessToken.Audience,
-            ClockSkew = TimeSpan.FromMinutes(1),  //默认允许5分钟时间差
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfig.AccessToken.SecretKey))
-        };
-
-        //添加token事件 
-        options.Events = new JwtBearerEvents
-        {
-            //token无效或者过期触发该事件
-            //OnAuthenticationFailed = context =>
-            //{
-            //    // 告诉后续 Challenge 要用哪个消息
-            //    context.HttpContext.Items["JwtError"] =
-            //        context.Exception is SecurityTokenExpiredException
-            //        ? "token expired"
-            //        : "token invalid";
-
-            //    // 取消默认处理，但不写 Response
-            //    context.NoResult();
-            //    return Task.CompletedTask;
-            //},
-            //此处为权限验证失败后触发的事件
-            OnChallenge = context =>
-            {
-                //此处代码为终止.Net Core默认的返回类型和数据结果，这个很重要
-                context.HandleResponse();
-                // 没有携带token
-                if (!context.Response.HasStarted)
-                {
-                    context.HandleResponse();
-                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                    //context.Response.ContentType = "application/json";
-                    context.Response.Headers.Append("Token-Error", context.ErrorDescription);
-
-                    return context.Response.WriteAsJsonAsync(JsonSerializer.Serialize(new
-                    {
-                        Code = 401,
-                        msg = "请提供有效的认证token"
-                    }));
-                }
-                return Task.CompletedTask;
-            },
-            OnForbidden = context =>
-            {
-                if(!context.Response.HasStarted)
-                {
-                    return context.Response.WriteAsJsonAsync(JsonSerializer.Serialize(new { Code = 403, msg = "无权访问该资源" }));
-                }
-                return Task.CompletedTask;
-            }
-        };
-    });
+builder.Services.AddAuthenticationSetup(configuration.GetRequiredSection("JwtConfig").Get<JwtConfig>());
 
 //注册自定义授权策略
-builder.Services.AddScoped<IAuthorizationHandler, RolePermissionHandler>();
+builder.Services.AddAuthorizationSetup();
+//builder.Services.AddScoped<IAuthorizationHandler, RolePermissionHandler>();
 
 //添加授权服务
 builder.Services.AddAuthorization(option =>

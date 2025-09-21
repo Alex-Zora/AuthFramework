@@ -5,7 +5,7 @@ namespace Model.Dto
     public class {{ class_name }}
     {
 {{ for item in properties }}
-        public {{ item.type }} {{ item.name }} { get; set; }
+        public {{ item.type }} {{ item.name }} { get; set; }{{if item.type == "string"}} = string.Empty;{{ end }}
 {{ end }}
     }
 }

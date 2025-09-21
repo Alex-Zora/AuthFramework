@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Model.Dto;
 using Model.Table.Authorize;
 using Model.ViewModel;
 using Services;
@@ -13,10 +15,12 @@ namespace BlogApi.Controllers
     public class PermissionController : ControllerBase
     {
         private readonly IBaseService<Permission> baseService;
+        private readonly IMapper mapper;
 
-        public PermissionController(IBaseService<Permission> baseService)
+        public PermissionController(IBaseService<Permission> baseService, IMapper mapper)
         {
             this.baseService = baseService;
+            this.mapper = mapper;
         }
 
         [HttpGet]
@@ -26,10 +30,10 @@ namespace BlogApi.Controllers
         }
 
         [HttpPost]
-        public async Task<ResponseResult<int>> Add(Permission model)
+        public async Task<ResponseResult<int>> Add(PermissionDto model)
         {
-
-            return ResponseResult<int>.Success(await baseService.Add(model), "添加成功!");
+            Permission permission = mapper.Map<Permission>(model);
+            return ResponseResult<int>.Success(await baseService.Add(permission), "添加成功!");
         }
 
         [HttpPut]

@@ -76,7 +76,7 @@ namespace Services.Impl
         public async Task<List<T>> GetListAsync<T>(string key = "", int start = 0, int end = -1) where T : class
         {
             List<T> list = new List<T>();
-            if(key.IsNullOrEmpty())
+            if(string.IsNullOrEmpty(key))
             {
                 RedisValue[] redisValues = await _database.ListRangeAsync(key, start, end);
                 list = redisValues.Select(x => JsonSerializer.Deserialize<T>(x!)).ToList()!;

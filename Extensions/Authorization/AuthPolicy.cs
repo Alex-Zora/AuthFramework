@@ -1,4 +1,4 @@
-﻿namespace BlogApi.Authorization
+﻿namespace Extensions.Authorization
 {
     public class AuthPolicy
     {

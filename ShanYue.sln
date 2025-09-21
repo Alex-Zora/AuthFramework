@@ -18,6 +18,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeGenerate", "CodeGenerat
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlogApi", "BlogApi\BlogApi.csproj", "{FDC53E20-1ADF-7C7D-1FE1-5874878FD458}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extensions", "Extensions\Extensions.csproj", "{164F5AE1-FADB-4F46-AD0F-71E8CA28C52E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -48,6 +50,10 @@ Global
 		{FDC53E20-1ADF-7C7D-1FE1-5874878FD458}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FDC53E20-1ADF-7C7D-1FE1-5874878FD458}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FDC53E20-1ADF-7C7D-1FE1-5874878FD458}.Release|Any CPU.Build.0 = Release|Any CPU
+		{164F5AE1-FADB-4F46-AD0F-71E8CA28C52E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{164F5AE1-FADB-4F46-AD0F-71E8CA28C52E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{164F5AE1-FADB-4F46-AD0F-71E8CA28C52E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{164F5AE1-FADB-4F46-AD0F-71E8CA28C52E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Extensions.Authorization.Requirement;
+using Microsoft.AspNetCore.Authorization;
 using Model.ViewModel;
-using ShanYue.Authorization.Requirement;
 using ShanYue.Cache;
 using ShanYue.Context;
 using ShanYue.Model;
@@ -8,7 +8,7 @@ using StackExchange.Redis;
 using System.Net;
 using System.Security.Claims;
 
-namespace ShanYue.Authorization.Handler
+namespace Extensions.Authorization.Handler
 {
     public class RolePermissionHandler : AuthorizationHandler<RolePermissionRequirement>
     {
@@ -17,8 +17,8 @@ namespace ShanYue.Authorization.Handler
 
         public RolePermissionHandler(IConnectionMultiplexer connectionMultiplexer, BlogContext blogContext)
         {
-            this._connectionMultiplexer = connectionMultiplexer;
-            this._blogContext = blogContext;
+            _connectionMultiplexer = connectionMultiplexer;
+            _blogContext = blogContext;
         }
 
         protected async override Task HandleRequirementAsync(AuthorizationHandlerContext context, RolePermissionRequirement requirement)

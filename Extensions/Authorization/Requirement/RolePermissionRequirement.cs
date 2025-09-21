@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 
-namespace ShanYue.Authorization.Requirement
+namespace Extensions.Authorization.Requirement
 {
     public class RolePermissionRequirement : IAuthorizationRequirement
     {
